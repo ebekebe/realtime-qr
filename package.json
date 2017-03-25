@@ -1,0 +1,9 @@
+{
+  "name": "realtime-qr",
+  "version": "0.0.1",
+  "description": "Displays an self-updating qr-code with the current time (or any other time variant data)",
+  "main": "index.js",
+  "repository": "https://github.com/ebekebe/realtime-qr",
+  "author": "Benjamin Karran",
+  "license": "MIT"
+}
