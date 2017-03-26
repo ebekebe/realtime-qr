@@ -1,4 +1,5 @@
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Time exposing (Time, second)
 import Date exposing (fromTime)
 import Date.Extra exposing (toIsoString)
@@ -56,8 +57,13 @@ view model =
       in
         div
           []
-          [ case qrResult of
-              Result.Err err -> text "An error occurred"
-              Result.Ok view -> view
-          , Html.text timeString
+          [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
+          , h1 [] [text timeString]
+          , div
+            [ class "qrcode" ]
+            [ case qrResult of
+                Result.Err err -> text "An error occurred"
+                -- Result.Ok view -> { view | facts = { facts | ATTR = { ATTR | height = Nothing }}}
+                Result.Ok view -> view
+            ]
           ]
