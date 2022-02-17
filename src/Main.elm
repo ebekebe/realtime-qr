@@ -1,12 +1,16 @@
+module Main exposing (..)
+
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Time exposing (Time, second)
-import Date exposing (fromTime)
-import Date.Extra exposing (toIsoString)
+import Time exposing (Posix)
+-- import Date exposing (fromTime)
+import Iso8601
 import QRCode
+import Svg.Attributes as SvgA
 
 main =
-  Html.program
+  Browser.element
     { init = init
     , view = view
     , update = update
@@ -16,18 +20,18 @@ main =
 
 -- MODEL
 
-type alias Model = Maybe Time
+type alias Model = Maybe Posix
 
 
-init : (Model, Cmd Msg)
-init =
+init : () -> (Model, Cmd Msg)
+init _ =
   (Nothing, Cmd.none)
 
 
 -- UPDATE
 
 type Msg
-  = Tick Time
+  = Tick Posix
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -41,7 +45,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every second Tick
+  Time.every 10.0 Tick
 
 
 -- VIEW
@@ -52,8 +56,11 @@ view model =
     Nothing -> text ""
     Just timestamp ->
       let
-        timeString = timestamp |> fromTime |> toIsoString
-        qrResult = QRCode.toSvg timeString
+        timeString = timestamp |> Iso8601.fromTime
+        qrResult = QRCode.fromString timeString
+          |> Result.map (
+            QRCode.toSvg [ SvgA.width "200px", SvgA.height "200px"]
+          )
       in
         div
           []
@@ -64,6 +71,6 @@ view model =
             [ case qrResult of
                 Result.Err err -> text "An error occurred"
                 -- Result.Ok view -> { view | facts = { facts | ATTR = { ATTR | height = Nothing }}}
-                Result.Ok view -> view
+                Result.Ok theView -> theView
             ]
           ]
