@@ -3,7 +3,7 @@ module Main exposing (..)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Time exposing (Posix)
+import Time exposing (Posix, utc, toMillis)
 -- import Date exposing (fromTime)
 import Iso8601
 import QRCode
@@ -38,7 +38,9 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick newTime ->
-      (Just newTime, Cmd.none)
+      case model of
+        Nothing -> (Just newTime, Cmd.none)
+        Just _ -> (Nothing, Cmd.none)
 
 
 -- SUBSCRIPTIONS
@@ -56,14 +58,16 @@ view model =
     Nothing -> text ""
     Just timestamp ->
       let
-        timeString = timestamp |> Iso8601.fromTime
+        -- timeString = (timestamp |> Iso8601.fromTime |> String.dropRight 5) ++ "Z"
+        timeString = (timestamp |> Iso8601.fromTime)
         qrResult = QRCode.fromString timeString
           |> Result.map (
-            QRCode.toSvg [ SvgA.width "200px", SvgA.height "200px"]
+            QRCode.toSvgWithoutQuietZone [ SvgA.width "200px", SvgA.height "200px"]
           )
+        milliseconds = timestamp |> toMillis utc |> toFloat
       in
         div
-          []
+          [ style "padding" "20px" ]
           [ Html.node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
           , h1 [] [text timeString]
           , div
@@ -73,4 +77,16 @@ view model =
                 -- Result.Ok view -> { view | facts = { facts | ATTR = { ATTR | height = Nothing }}}
                 Result.Ok theView -> theView
             ]
+          , div
+            [ style "width" ((String.fromFloat (milliseconds/5)) ++ "px")
+            , style "height" "100px"
+            , style "background-color" "black"
+            ]
+            []
+          , div
+            [ style "width" "200px"
+            , style "height" "100px"
+            , style "background-color" "black"
+            ]
+            []
           ]

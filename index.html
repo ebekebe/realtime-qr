@@ -5949,9 +5949,13 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var newTime = msg.a;
-		return _Utils_Tuple2(
-			$elm$core$Maybe$Just(newTime),
-			$elm$core$Platform$Cmd$none);
+		if (model.$ === 'Nothing') {
+			return _Utils_Tuple2(
+				$elm$core$Maybe$Just(newTime),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			return _Utils_Tuple2($elm$core$Maybe$Nothing, $elm$core$Platform$Cmd$none);
+		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5963,6 +5967,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $pablohirafuji$elm_qrcode$QRCode$Quartile = {$: 'Quartile'};
 var $pablohirafuji$elm_qrcode$QRCode$QRCode = function (a) {
 	return {$: 'QRCode', a: a};
@@ -10246,6 +10251,8 @@ var $elm$virtual_dom$VirtualDom$node = function (tag) {
 };
 var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
 var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $pablohirafuji$elm_qrcode$QRCode$Render$Svg$moduleSize = 5;
@@ -10261,7 +10268,6 @@ var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$Attributes$shapeRendering = _VirtualDom_attribute('shape-rendering');
@@ -10358,11 +10364,11 @@ var $pablohirafuji$elm_qrcode$QRCode$Render$Svg$viewBase = F3(
 										A2($elm$core$Basics$composeR, $pablohirafuji$elm_qrcode$QRCode$Render$Svg$appendLastRect, $elm$core$List$reverse)),
 									matrix)))))));
 	});
-var $pablohirafuji$elm_qrcode$QRCode$Render$Svg$view = $pablohirafuji$elm_qrcode$QRCode$Render$Svg$viewBase(4);
-var $pablohirafuji$elm_qrcode$QRCode$toSvg = F2(
+var $pablohirafuji$elm_qrcode$QRCode$Render$Svg$viewWithoutQuietZone = $pablohirafuji$elm_qrcode$QRCode$Render$Svg$viewBase(0);
+var $pablohirafuji$elm_qrcode$QRCode$toSvgWithoutQuietZone = F2(
 	function (extraAttrs, _v0) {
 		var matrix = _v0.a.matrix;
-		return A2($pablohirafuji$elm_qrcode$QRCode$Render$Svg$view, extraAttrs, matrix);
+		return A2($pablohirafuji$elm_qrcode$QRCode$Render$Svg$viewWithoutQuietZone, extraAttrs, matrix);
 	});
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$view = function (model) {
@@ -10373,16 +10379,20 @@ var $author$project$Main$view = function (model) {
 		var timeString = $rtfeldman$elm_iso8601_date_strings$Iso8601$fromTime(timestamp);
 		var qrResult = A2(
 			$elm$core$Result$map,
-			$pablohirafuji$elm_qrcode$QRCode$toSvg(
+			$pablohirafuji$elm_qrcode$QRCode$toSvgWithoutQuietZone(
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$width('200px'),
 						$elm$svg$Svg$Attributes$height('200px')
 					])),
 			$pablohirafuji$elm_qrcode$QRCode$fromString(timeString));
+		var milliseconds = A2($elm$time$Time$toMillis, $elm$time$Time$utc, timestamp);
 		return A2(
 			$elm$html$Html$div,
-			_List_Nil,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'padding', '20px')
+				]),
 			_List_fromArray(
 				[
 					A3(
@@ -10418,7 +10428,28 @@ var $author$project$Main$view = function (model) {
 								return theView;
 							}
 						}()
-						]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$Attributes$style,
+							'width',
+							$elm$core$String$fromFloat(milliseconds / 5) + 'px'),
+							A2($elm$html$Html$Attributes$style, 'height', '100px'),
+							A2($elm$html$Html$Attributes$style, 'background-color', 'black')
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'width', '200px'),
+							A2($elm$html$Html$Attributes$style, 'height', '100px'),
+							A2($elm$html$Html$Attributes$style, 'background-color', 'black')
+						]),
+					_List_Nil)
 				]));
 	}
 };
